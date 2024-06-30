@@ -16,7 +16,7 @@ struct ContentView: View {
 					Spacer()
 					Text("\(timeTracker.getTimeString(for: timeInterval))")
 				}
-				.font(.title.weight(.heavy))
+				.font(.title.weight(.heavy).monospacedDigit())
 				.padding()
 				.frame(minWidth: 200)
 				.background(Color.black.opacity(0.8))
@@ -54,15 +54,29 @@ struct ContentView: View {
 		}
 		if isDropdownVisible {
 			VStack {
-				Text("G: \(timeTracker.getTimeString(for: timeTracker.meditationTime))")
-					.font(.title2.weight(.medium))
-					.shadow(radius: 5)
-				Text("O: \(timeTracker.getTimeString(for: timeTracker.officeTime))")
-					.shadow(radius: 5)
-					.font(.title2.weight(.medium))
-				Text("D: \(timeTracker.getTimeString(for: timeTracker.idleTime))")
-					.shadow(radius: 5)
-					.font(.title2.weight(.medium))
+				HStack{
+					Text("G:")
+					Spacer()
+					Text("\(timeTracker.getTimeString(for: timeTracker.meditationTime))")
+						.font(.title2.weight(.medium).monospacedDigit())
+						.shadow(radius: 5)
+				}
+				HStack{
+					Text("O:")
+					Spacer()
+					Text("\(timeTracker.getTimeString(for: timeTracker.officeTime))")
+						.font(.title2.weight(.medium).monospacedDigit())
+						.shadow(radius: 5)
+				}
+				HStack{
+					Text("D:")
+					Spacer()
+					Text("\(timeTracker.getTimeString(for: timeTracker.idleTime))")
+						.font(.title2.weight(.medium).monospacedDigit())
+						.shadow(radius: 5)
+				}
+
+
 
 
 			}
@@ -74,14 +88,21 @@ struct ContentView: View {
 			.padding()
 			.background(Color.mint.gradient.opacity(0.8))
 			.cornerRadius(8)
+			.frame(maxWidth: 105)
 		}
 	}
 	
 	func startTimer() {
+		stopTimer() // Stop any existing timer before starting a new one
 		timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
 			timeInterval += 1
 			updateCategoryTime()
 		}
+	}
+
+	func stopTimer() {
+		timer?.invalidate()
+		timer = nil
 	}
 	
 	func updateCategoryTime() {
