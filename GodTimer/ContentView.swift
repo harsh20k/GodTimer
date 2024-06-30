@@ -7,6 +7,8 @@ struct ContentView: View {
 	@State private var timeInterval: TimeInterval = 0
 	@State private var isDropdownVisible: Bool = false
 	@State private var timer: Timer?
+	@State private var hoveredCategory: String?
+
 
 	var body: some View {
 		ZStack {
@@ -44,7 +46,7 @@ struct ContentView: View {
 				 }) { Text("Idle") }
 		}
 			HStack {
-				Text("\(selectedCategory):")
+				Text("\(selectedCategory)")
 					.font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/.bold())
 					.frame(width:60, height: 60)
 					.background(Color.mint.gradient)
@@ -60,6 +62,14 @@ struct ContentView: View {
 					Text("\(timeTracker.getTimeString(for: timeTracker.meditationTime))")
 						.font(.title2.weight(.medium).monospacedDigit())
 						.shadow(radius: 5)
+						.foregroundColor(hoveredCategory == "G" ? Color.orange : Color.white)
+						.onTapGesture {
+							selectedCategory = "G"
+							timeInterval = timeTracker.meditationTime
+						}
+						.onHover { hovering in
+							hoveredCategory = hovering ? "G" : nil
+						}
 				}
 				HStack{
 					Text("O:")
@@ -67,6 +77,14 @@ struct ContentView: View {
 					Text("\(timeTracker.getTimeString(for: timeTracker.officeTime))")
 						.font(.title2.weight(.medium).monospacedDigit())
 						.shadow(radius: 5)
+						.foregroundColor(hoveredCategory == "O" ? Color.orange : Color.white)
+						.onTapGesture {
+							selectedCategory = "O"
+							timeInterval = timeTracker.officeTime
+						}
+						.onHover { hovering in
+							hoveredCategory = hovering ? "O" : nil
+						}
 				}
 				HStack{
 					Text("D:")
@@ -74,11 +92,16 @@ struct ContentView: View {
 					Text("\(timeTracker.getTimeString(for: timeTracker.idleTime))")
 						.font(.title2.weight(.medium).monospacedDigit())
 						.shadow(radius: 5)
+						.foregroundColor(hoveredCategory == "D" ? Color.orange : Color.white)
+						.onTapGesture {
+							selectedCategory = "D"
+							timeInterval = timeTracker.idleTime
+						}
+						.onHover { hovering in
+							hoveredCategory = hovering ? "D" : nil
+						}
+					
 				}
-
-
-
-
 			}
 			.onTapGesture {
 				withAnimation {
