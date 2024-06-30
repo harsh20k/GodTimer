@@ -5,7 +5,7 @@ struct TimeTrackerApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView()
-				.frame(width: 400, height: 600)
+				.frame(width: 200, height: 600)
 				.background(WindowAccessor { window in
 					if let window = window {
 						window.title = "Circular Window"
@@ -16,6 +16,7 @@ struct TimeTrackerApp: App {
 						window.standardWindowButton(.zoomButton)?.isHidden = true
 						window.styleMask.remove(.titled)
 						window.styleMask.insert(.fullSizeContentView)
+						window.level = .statusBar // This line keeps the window always on top
 					}
 				})
 		}

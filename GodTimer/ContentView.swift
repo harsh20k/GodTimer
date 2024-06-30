@@ -16,10 +16,11 @@ struct ContentView: View {
 					Spacer()
 					Text("\(timeTracker.getTimeString(for: timeInterval))")
 				}
+				.font(.title.weight(.heavy))
 				.padding()
-				.frame(minWidth: 100)
+				.frame(minWidth: 200)
 				.background(Color.black.opacity(0.8))
-				.cornerRadius(8)
+				.cornerRadius(12)
 				.onTapGesture {
 					withAnimation {
 						isDropdownVisible.toggle()
@@ -45,7 +46,7 @@ struct ContentView: View {
 			HStack {
 				Text("\(selectedCategory):")
 					.font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/.bold())
-					.frame(width:50, height: 50)
+					.frame(width:60, height: 60)
 					.background(Color.mint.gradient)
 				.clipShape(Circle())
 				Spacer()
@@ -54,8 +55,16 @@ struct ContentView: View {
 		if isDropdownVisible {
 			VStack {
 				Text("G: \(timeTracker.getTimeString(for: timeTracker.meditationTime))")
+					.font(.title2.weight(.medium))
+					.shadow(radius: 5)
 				Text("O: \(timeTracker.getTimeString(for: timeTracker.officeTime))")
+					.shadow(radius: 5)
+					.font(.title2.weight(.medium))
 				Text("D: \(timeTracker.getTimeString(for: timeTracker.idleTime))")
+					.shadow(radius: 5)
+					.font(.title2.weight(.medium))
+
+
 			}
 			.onTapGesture {
 				withAnimation {
@@ -63,7 +72,7 @@ struct ContentView: View {
 				}
 			}
 			.padding()
-			.background(Color.gray.opacity(0.8))
+			.background(Color.mint.gradient.opacity(0.8))
 			.cornerRadius(8)
 		}
 	}
@@ -78,11 +87,11 @@ struct ContentView: View {
 	func updateCategoryTime() {
 		switch selectedCategory {
 		case "G":
-			timeTracker.meditationTime += 1
+			timeTracker.meditationTime = timeInterval
 		case "O":
-			timeTracker.officeTime += 1
+			timeTracker.officeTime = timeInterval
 		case "D":
-			timeTracker.idleTime += 1
+			timeTracker.idleTime = timeInterval
 		default:
 			break
 		}
