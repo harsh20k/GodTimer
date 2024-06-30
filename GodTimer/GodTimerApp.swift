@@ -5,7 +5,7 @@ struct TimeTrackerApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView()
-				.frame(width: 200, height: 600)
+				.frame(width: 200, height: 160)
 				.background(WindowAccessor { window in
 					if let window = window {
 						window.title = "Circular Window"

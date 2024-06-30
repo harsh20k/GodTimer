@@ -56,52 +56,9 @@ struct ContentView: View {
 		}
 		if isDropdownVisible {
 			VStack {
-				HStack{
-					Text("G:")
-					Spacer()
-					Text("\(timeTracker.getTimeString(for: timeTracker.meditationTime))")
-						.font(.title2.weight(.medium).monospacedDigit())
-						.shadow(radius: 5)
-						.foregroundColor(hoveredCategory == "G" ? Color.orange : Color.white)
-						.onTapGesture {
-							selectedCategory = "G"
-							timeInterval = timeTracker.meditationTime
-						}
-						.onHover { hovering in
-							hoveredCategory = hovering ? "G" : nil
-						}
-				}
-				HStack{
-					Text("O:")
-					Spacer()
-					Text("\(timeTracker.getTimeString(for: timeTracker.officeTime))")
-						.font(.title2.weight(.medium).monospacedDigit())
-						.shadow(radius: 5)
-						.foregroundColor(hoveredCategory == "O" ? Color.orange : Color.white)
-						.onTapGesture {
-							selectedCategory = "O"
-							timeInterval = timeTracker.officeTime
-						}
-						.onHover { hovering in
-							hoveredCategory = hovering ? "O" : nil
-						}
-				}
-				HStack{
-					Text("D:")
-					Spacer()
-					Text("\(timeTracker.getTimeString(for: timeTracker.idleTime))")
-						.font(.title2.weight(.medium).monospacedDigit())
-						.shadow(radius: 5)
-						.foregroundColor(hoveredCategory == "D" ? Color.orange : Color.white)
-						.onTapGesture {
-							selectedCategory = "D"
-							timeInterval = timeTracker.idleTime
-						}
-						.onHover { hovering in
-							hoveredCategory = hovering ? "D" : nil
-						}
-					
-				}
+				categoryRow(category: "G", time: timeTracker.getTimeString(for: timeTracker.meditationTime))
+				categoryRow(category: "O", time: timeTracker.getTimeString(for: timeTracker.officeTime))
+				categoryRow(category: "D", time: timeTracker.getTimeString(for: timeTracker.idleTime))
 			}
 			.onTapGesture {
 				withAnimation {
@@ -112,6 +69,45 @@ struct ContentView: View {
 			.background(Color.mint.gradient.opacity(0.8))
 			.cornerRadius(8)
 			.frame(maxWidth: 105)
+		}
+	}
+	
+	
+	@ViewBuilder
+	private func categoryRow(category: String, time: String) -> some View {
+		GeometryReader{ proxy in
+			HStack {
+				Text("\(category):")
+				Spacer()
+				Text(time)
+					.font(.title2.weight(.medium).monospacedDigit())
+					.shadow(radius: 5)
+					.foregroundColor(hoveredCategory == category ? Color.orange : Color.white)
+					.onTapGesture {
+						withAnimation {
+							selectedCategory = category
+							switch category {
+							case "G":
+								timeInterval = timeTracker.meditationTime
+							case "O":
+								timeInterval = timeTracker.officeTime
+							case "D":
+								timeInterval = timeTracker.idleTime
+							default:
+								break
+							}
+						}
+					}
+					.onHover { hovering in
+						hoveredCategory = hovering ? category : nil
+						
+					}
+			}
+			.background(
+				RoundedRectangle(cornerRadius: 10)
+					.fill(selectedCategory == category ? Color.gray.opacity(0.5) : Color.clear)
+					.animation(.snappy, value: selectedCategory)
+			)
 		}
 	}
 	
