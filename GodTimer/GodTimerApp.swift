@@ -1,17 +1,54 @@
-//
-//  GodTimerApp.swift
-//  GodTimer
-//
-//  Created by harsh  on 29/06/24.
-//
-
 import SwiftUI
 
 @main
-struct GodTimerApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+struct TimeTrackerApp: App {
+	var body: some Scene {
+		WindowGroup {
+			ContentView()
+				.frame(width: 400, height: 600)
+				.background(WindowAccessor { window in
+					if let window = window {
+						window.title = "Circular Window"
+						window.isOpaque = true
+						window.backgroundColor = .clear
+						window.standardWindowButton(.closeButton)?.isHidden = true
+						window.standardWindowButton(.miniaturizeButton)?.isHidden = true
+						window.standardWindowButton(.zoomButton)?.isHidden = true
+						window.styleMask.remove(.titled)
+						window.styleMask.insert(.fullSizeContentView)
+					}
+				})
+		}
+	}
+}
+
+struct WindowAccessor: NSViewRepresentable {
+	var callback: (NSWindow?) -> Void
+
+	func makeNSView(context: Context) -> NSView {
+		return NSView()
+	}
+
+	func updateNSView(_ nsView: NSView, context: Context) {
+		DispatchQueue.main.async {
+			self.callback(nsView.window)
+		}
+	}
+}
+
+struct DraggableWindow: NSViewRepresentable {
+	func makeNSView(context: Context) -> NSView {
+		let view = NSView()
+		DispatchQueue.main.async {
+			if let window = view.window {
+				window.isMovableByWindowBackground = true
+				window.titleVisibility = .hidden
+				window.titlebarAppearsTransparent = true
+				window.styleMask.insert(.fullSizeContentView)
+			}
+		}
+		return view
+	}
+	
+	func updateNSView(_ nsView: NSView, context: Context) {}
 }
