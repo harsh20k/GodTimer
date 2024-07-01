@@ -9,88 +9,96 @@ struct ContentView: View {
 	@State private var hoveredCategory: String?
 	
 	var body: some View {
-		ZStack {
-			Grid {
-				GridRow{
-					HStack{
-						
-					}
-					.frame(width: 30)
-					HStack {
-						Spacer()
-						Text("\(timeTracker.getTimeString(for: timeInterval))")
-					}
-					.font(.title.weight(.heavy).monospacedDigit())
+		ZStack{
+				//Dropdownlist
+			VStack{
+				VStack{}.frame(height: 150)
+				if isDropdownVisible {
+					DropdownList(
+						isDropdownVisible: $isDropdownVisible,
+						selectedCategory: $selectedCategory,
+						timeTracker: timeTracker,
+						hoveredCategory: $hoveredCategory,
+						timeInterval: $timeInterval
+					)
 					.padding()
-					.frame(minWidth: 200)
-					.background(Color.black.opacity(0.8))
-					.cornerRadius(12)
-					.onTapGesture {
-						withAnimation {
-							isDropdownVisible.toggle()
+					.background(Color.mint.gradient.opacity(0.8))
+					.cornerRadius(8)
+					.frame(maxWidth: 105, minHeight: 90)
+					.transition(AnyTransition.opacity
+						.combined(with: .move(edge: .top))
+						.combined(with: .verticalScale)) // Custom transition
+				}
+			}
+			ZStack {
+				Grid {
+					GridRow{
+						HStack{//empty view just to push the timer to the right
+						}.frame(width: 30)
+						HStack {
+							Spacer()
+							Text("\(timeTracker.getTimeString(for: timeInterval))")
+						}
+						.font(.title.weight(.heavy).monospacedDigit())
+						.padding()
+						.frame(minWidth: 200)
+						.background(Color.black.opacity(0.8))
+						.cornerRadius(12)
+						.onTapGesture {
+							withAnimation(.easeInOut(duration: 0.2)) {
+								isDropdownVisible.toggle()
+							}
+						}
+						.background(DraggableWindow())
+						.onAppear(perform: startTimer)
+						.contextMenu {
+							Button(action: {
+								withAnimation {
+									selectedCategory = "G"
+									timeInterval = timeTracker.meditationTime
+								}
+							}) { Text("Meditation") }
+							Button(action: {
+								withAnimation {
+									selectedCategory = "O"
+									timeInterval = timeTracker.officeTime
+								}
+							}) { Text("Office") }
+							Button(action: {
+								withAnimation {
+									selectedCategory = "D"
+									timeInterval = timeTracker.idleTime
+								}
+							}) { Text("Idle") }
 						}
 					}
-					.background(DraggableWindow())
-					.onAppear(perform: startTimer)
-					.contextMenu {
-						Button(action: {
-							withAnimation {
-								selectedCategory = "G"
-								timeInterval = timeTracker.meditationTime
-							}
-						}) { Text("Meditation") }
-						Button(action: {
-							withAnimation {
-								selectedCategory = "O"
-								timeInterval = timeTracker.officeTime
-							}
-						}) { Text("Office") }
-						Button(action: {
-							withAnimation {
-								selectedCategory = "D"
-								timeInterval = timeTracker.idleTime
-							}
-						}) { Text("Idle") }
+				}
+				
+					//Circle with category name
+				HStack {
+					if selectedCategory == "G" {
+						Text("\(selectedCategory)")
+							.font(.title.bold())
+							.frame(width: 65, height: 65)
+							.background(Color.orange.gradient)
+							.clipShape(Circle())
+					} else if selectedCategory == "O" {
+						Text("\(selectedCategory)")
+							.font(.title.bold())
+							.frame(width: 65, height: 65)
+							.background(Color.blue.gradient)
+							.clipShape(Circle())
+					} else {
+						Text("\(selectedCategory)")
+							.font(.title.bold())
+							.frame(width: 65, height: 65)
+							.background(Color.red.gradient)
+							.clipShape(Circle())
 					}
+					Spacer()
 				}
 			}
-			
-				//Circle with category name
-			HStack {
-				if selectedCategory == "G" {
-					Text("\(selectedCategory)")
-						.font(.title.bold())
-						.frame(width: 65, height: 65)
-						.background(Color.orange.gradient)
-						.clipShape(Circle())
-				} else if selectedCategory == "O" {
-					Text("\(selectedCategory)")
-						.font(.title.bold())
-						.frame(width: 65, height: 65)
-						.background(Color.blue.gradient)
-						.clipShape(Circle())
-				} else {
-					Text("\(selectedCategory)")
-						.font(.title.bold())
-						.frame(width: 65, height: 65)
-						.background(Color.red.gradient)
-						.clipShape(Circle())
-				}
-				Spacer()
-			}
-		}
-		if isDropdownVisible {
-			DropdownList(
-				isDropdownVisible: $isDropdownVisible,
-				selectedCategory: $selectedCategory,
-				timeTracker: timeTracker,
-				hoveredCategory: $hoveredCategory,
-				timeInterval: $timeInterval
-			)
-			.padding()
-			.background(Color.mint.gradient.opacity(0.8))
-			.cornerRadius(8)
-			.frame(maxWidth: 105)
+
 		}
 	}
 	
@@ -120,6 +128,24 @@ struct ContentView: View {
 		}
 	}
 }
+
+extension AnyTransition {
+	static var verticalScale: AnyTransition {
+		AnyTransition.modifier(
+			active: ScaleEffectModifier(scale: 0.2),
+			identity: ScaleEffectModifier(scale: 1.0)
+		)
+	}
+	
+	struct ScaleEffectModifier: ViewModifier {
+		var scale: CGFloat
+		
+		func body(content: Content) -> some View {
+			content.scaleEffect(CGSize(width: 1.0, height: scale), anchor: .top)
+		}
+	}
+}
+
 
 #Preview {
 	ContentView()
