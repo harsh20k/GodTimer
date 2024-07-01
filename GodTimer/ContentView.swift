@@ -1,4 +1,3 @@
-
 import SwiftUI
 
 struct ContentView: View {
@@ -8,13 +7,16 @@ struct ContentView: View {
 	@State private var isDropdownVisible: Bool = false
 	@State private var timer: Timer?
 	@State private var hoveredCategory: String?
-
-
+	
 	var body: some View {
-			ZStack {
-				VStack {
+		ZStack {
+			Grid {
+				GridRow{
 					HStack{
 						
+					}
+					.frame(width: 30)
+					HStack {
 						Spacer()
 						Text("\(timeTracker.getTimeString(for: timeInterval))")
 					}
@@ -28,109 +30,67 @@ struct ContentView: View {
 							isDropdownVisible.toggle()
 						}
 					}
-				}
-				.background(DraggableWindow())
-				.onAppear(perform: startTimer)
-				.contextMenu {
-					Button(action: {
-						selectedCategory = "G"
-						timeInterval = timeTracker.meditationTime
-					}) { Text("Meditation") }
-					Button(action: {
-						selectedCategory = "O"
-						timeInterval = timeTracker.officeTime
-					}) { Text("Office") }
-					Button(action: {
-						selectedCategory = "D"
-						timeInterval = timeTracker.idleTime
-					}) { Text("Idle") }
-				}
-				HStack {
-					if(selectedCategory == "G"){
-						Text("\(selectedCategory)")
-							.font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/.bold())
-							.frame(width:60, height: 60)
-							.background(Color.orange.gradient)
-							.clipShape(Circle())
-					} else if (selectedCategory == "O"){
-						Text("\(selectedCategory)")
-							.font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/.bold())
-							.frame(width:60, height: 60)
-							.background(Color.blue.gradient)
-							.clipShape(Circle())
-					} else {
-						Text("\(selectedCategory)")
-							.font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/.bold())
-							.frame(width:60, height: 60)
-							.background(Color.red.gradient)
-							.clipShape(Circle())
-					}
-					Spacer()
-				}
-			}
-			if isDropdownVisible {
-				VStack {
-					categoryRow(category: "G", time: timeTracker.getTimeString(for: timeTracker.meditationTime))
-					categoryRow(category: "O", time: timeTracker.getTimeString(for: timeTracker.officeTime))
-					categoryRow(category: "D", time: timeTracker.getTimeString(for: timeTracker.idleTime))
-				}
-				.onTapGesture {
-					withAnimation {
-						isDropdownVisible.toggle()
-					}
-				}
-				.padding()
-				.background(Color.mint.gradient.opacity(0.8))
-				.cornerRadius(8)
-				.frame(maxWidth: 105)
-			}
-		
-		
-	}
-	
-	
-	@ViewBuilder
-	private func categoryRow(category: String, time: String) -> some View {
-		GeometryReader{ proxy in
-			HStack {
-				Text("\(category):")
-				Spacer()
-				Text(time)
-					.font(.title2.weight(.medium).monospacedDigit())
-					.shadow(radius: 5)
-					.foregroundColor(hoveredCategory == category ? Color.orange : Color.white)
-					.onTapGesture {
-						withAnimation {
-							selectedCategory = category
-							switch category {
-							case "G":
+					.background(DraggableWindow())
+					.onAppear(perform: startTimer)
+					.contextMenu {
+						Button(action: {
+							withAnimation {
+								selectedCategory = "G"
 								timeInterval = timeTracker.meditationTime
-							case "O":
-								timeInterval = timeTracker.officeTime
-							case "D":
-								timeInterval = timeTracker.idleTime
-							default:
-								break
 							}
-						}
+						}) { Text("Meditation") }
+						Button(action: {
+							withAnimation {
+								selectedCategory = "O"
+								timeInterval = timeTracker.officeTime
+							}
+						}) { Text("Office") }
+						Button(action: {
+							withAnimation {
+								selectedCategory = "D"
+								timeInterval = timeTracker.idleTime
+							}
+						}) { Text("Idle") }
 					}
-					.onHover { hovering in
-						hoveredCategory = hovering ? category : nil
-							let frame = proxy.frame(in: .global)
-//							let categoryFrame = CGRect(x: frame.minX, y: frame.minY + yOffset, width: frame.width, height: frame.height)
-						print ("""
-									frame.minx \(frame.minX)
-									frame.miny \(frame.minY)
-									frame.width \(frame.width)
-									frame.height \(frame.height)
-								""")
-					}
+				}
 			}
-			.background(
-				RoundedRectangle(cornerRadius: 10)
-					.fill(selectedCategory == category ? Color.gray.opacity(0.5) : Color.clear)
-					.animation(.snappy, value: selectedCategory)
+			
+				//Circle with category name
+			HStack {
+				if selectedCategory == "G" {
+					Text("\(selectedCategory)")
+						.font(.title.bold())
+						.frame(width: 65, height: 65)
+						.background(Color.orange.gradient)
+						.clipShape(Circle())
+				} else if selectedCategory == "O" {
+					Text("\(selectedCategory)")
+						.font(.title.bold())
+						.frame(width: 65, height: 65)
+						.background(Color.blue.gradient)
+						.clipShape(Circle())
+				} else {
+					Text("\(selectedCategory)")
+						.font(.title.bold())
+						.frame(width: 65, height: 65)
+						.background(Color.red.gradient)
+						.clipShape(Circle())
+				}
+				Spacer()
+			}
+		}
+		if isDropdownVisible {
+			DropdownList(
+				isDropdownVisible: $isDropdownVisible,
+				selectedCategory: $selectedCategory,
+				timeTracker: timeTracker,
+				hoveredCategory: $hoveredCategory,
+				timeInterval: $timeInterval
 			)
+			.padding()
+			.background(Color.mint.gradient.opacity(0.8))
+			.cornerRadius(8)
+			.frame(maxWidth: 105)
 		}
 	}
 	
@@ -141,7 +101,7 @@ struct ContentView: View {
 			updateCategoryTime()
 		}
 	}
-
+	
 	func stopTimer() {
 		timer?.invalidate()
 		timer = nil
@@ -162,5 +122,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+	ContentView()
 }
