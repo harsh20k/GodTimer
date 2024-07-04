@@ -24,7 +24,7 @@ struct ContentView: View {
 					.padding()
 					.background(Color.mint.gradient.opacity(0.8))
 					.cornerRadius(8)
-					.frame(maxWidth: 105, minHeight: 90)
+					.frame(maxWidth: CGFloat(DropdownList.dropDownWidth+55), minHeight: 90)
 					.transition(AnyTransition.opacity
 						.combined(with: .move(edge: .top))
 						.combined(with: .verticalScale)) // Custom transition

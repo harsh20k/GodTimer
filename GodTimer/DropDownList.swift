@@ -8,17 +8,54 @@ struct DropdownList: View {
 	@Binding var hoveredCategory: String?
 	@Binding var timeInterval: TimeInterval
 	static private var transitionDuration = 0.3
+	static public var dropDownWidth = 80
+	@State private var isRightArrowHovered = false
 	
 	var body: some View {
-		VStack {
-			categoryRow(category: "G", time: timeTracker.getTimeString(for: timeTracker.meditationTime))
-			categoryRow(category: "O", time: timeTracker.getTimeString(for: timeTracker.officeTime))
-			categoryRow(category: "D", time: timeTracker.getTimeString(for: timeTracker.idleTime))
-		}
-		.onTapGesture {
-			withAnimation {
-				isDropdownVisible.toggle()
+		HStack {
+			//three rows for timers
+			VStack {
+				categoryRow(category: "G", time: timeTracker.getTimeString(for: timeTracker.meditationTime))
+				categoryRow(category: "O", time: timeTracker.getTimeString(for: timeTracker.officeTime))
+				categoryRow(category: "D", time: timeTracker.getTimeString(for: timeTracker.idleTime))
 			}
+			.onTapGesture {
+				withAnimation {
+					isDropdownVisible.toggle()
+				}
+		}
+			.frame(width: CGFloat(DropdownList.dropDownWidth))
+			//empty hstack just to push the right arrow to the right
+			HStack{
+				
+			}
+			.frame(width: 1)
+			ZStack {
+				if(isRightArrowHovered){
+					Capsule()
+						.fill(Color.black.opacity(0.4))
+						.overlay(
+							Capsule()
+								.stroke(Color.white.opacity(0.7), lineWidth: 1)
+						)
+				} else {
+					Capsule()
+						.fill(Color.black.opacity(0.1))
+						.overlay(
+							Capsule()
+								.stroke(Color.white.opacity(0.2), lineWidth: 1)
+						)
+				}
+				Image(systemName: "arrowshape.right.fill")
+					.foregroundStyle(isRightArrowHovered ? Color.orange : Color.white)
+					.frame(width: 5)
+			}
+			.onHover(perform: { hovering in
+				isRightArrowHovered = hovering
+			})
+			.frame(width:20, height:65)
+
+
 		}
 	}
 	
@@ -62,6 +99,10 @@ struct DropdownList: View {
 					if selectedCategory == category {
 						Capsule()
 							.fill(Color.black.opacity(0.9))
+							.overlay(
+								Capsule()
+									.stroke(Color.white.opacity(0.5), lineWidth: 1)
+							)
 							.matchedGeometryEffect(id: "rectangle", in: animationSpace)
 					}
 				}
