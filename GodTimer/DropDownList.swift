@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct DropdownList: View {
+	@Namespace private var animationSpace
 	@Binding var isDropdownVisible: Bool
 	@Binding var selectedCategory: String
 	@ObservedObject var timeTracker: TimeTracker
@@ -9,9 +10,9 @@ struct DropdownList: View {
 	
 	var body: some View {
 		VStack {
-			categoryRow(category: "G", time: timeTracker.getTimeString(for: timeTracker.meditationTime))
-			categoryRow(category: "O", time: timeTracker.getTimeString(for: timeTracker.officeTime))
-			categoryRow(category: "D", time: timeTracker.getTimeString(for: timeTracker.idleTime))
+			categoryRow(category: "G", time: timeTracker.getTimeString(for: timeTracker.meditationTime), naming: animationSpace)
+			categoryRow(category: "O", time: timeTracker.getTimeString(for: timeTracker.officeTime), naming: animationSpace)
+			categoryRow(category: "D", time: timeTracker.getTimeString(for: timeTracker.idleTime), naming: animationSpace)
 		}
 		.onTapGesture {
 			withAnimation {
@@ -21,7 +22,7 @@ struct DropdownList: View {
 	}
 	
 	@ViewBuilder
-	private func categoryRow(category: String, time: String) -> some View {
+	private func categoryRow(category: String, time: String, naming: Namespace.ID) -> some View {
 		GeometryReader { proxy in
 			HStack {
 				Text("\(category):")
@@ -58,7 +59,8 @@ struct DropdownList: View {
 			}
 			.background(
 				RoundedRectangle(cornerRadius: 10)
-					.fill(selectedCategory == category ? Color.gray.opacity(0.5) : Color.clear)
+					.fill(selectedCategory == category ? Color.black.opacity(0.5) : Color.clear)
+					.matchedGeometryEffect(id: "rectangle", in: naming)
 					.animation(.snappy, value: selectedCategory)
 			)
 		}
