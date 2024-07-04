@@ -10,9 +10,9 @@ struct DropdownList: View {
 	
 	var body: some View {
 		VStack {
-			categoryRow(category: "G", time: timeTracker.getTimeString(for: timeTracker.meditationTime), naming: animationSpace)
-			categoryRow(category: "O", time: timeTracker.getTimeString(for: timeTracker.officeTime), naming: animationSpace)
-			categoryRow(category: "D", time: timeTracker.getTimeString(for: timeTracker.idleTime), naming: animationSpace)
+			categoryRow(category: "G", time: timeTracker.getTimeString(for: timeTracker.meditationTime))
+			categoryRow(category: "O", time: timeTracker.getTimeString(for: timeTracker.officeTime))
+			categoryRow(category: "D", time: timeTracker.getTimeString(for: timeTracker.idleTime))
 		}
 		.onTapGesture {
 			withAnimation {
@@ -22,7 +22,7 @@ struct DropdownList: View {
 	}
 	
 	@ViewBuilder
-	private func categoryRow(category: String, time: String, naming: Namespace.ID) -> some View {
+	private func categoryRow(category: String, time: String) -> some View {
 		GeometryReader { proxy in
 			HStack {
 				Text("\(category):")
@@ -32,7 +32,7 @@ struct DropdownList: View {
 					.shadow(radius: 5)
 					.foregroundColor(hoveredCategory == category ? Color.orange : Color.white)
 					.onTapGesture {
-						withAnimation {
+						withAnimation(.snappy()) {
 							selectedCategory = category
 							switch category {
 							case "G":
@@ -48,22 +48,19 @@ struct DropdownList: View {
 					}
 					.onHover { hovering in
 						hoveredCategory = hovering ? category : nil
-						let frame = proxy.frame(in: .global)
-						print("""
-							frame.minx \(frame.minX)
-							frame.miny \(frame.minY)
-							frame.width \(frame.width)
-							frame.height \(frame.height)
-						""")
 					}
 			}
 			.background(
-				RoundedRectangle(cornerRadius: 10)
-					.fill(selectedCategory == category ? Color.black.opacity(0.5) : Color.clear)
-					.matchedGeometryEffect(id: "rectangle", in: naming)
-					.animation(.snappy, value: selectedCategory)
+				ZStack {
+					if selectedCategory == category {
+						RoundedRectangle(cornerRadius: 10)
+							.fill(Color.black.opacity(0.5))
+							.matchedGeometryEffect(id: "rectangle", in: animationSpace)
+					}
+				}
 			)
 		}
+		.frame(height: 15)
 	}
 }
 
