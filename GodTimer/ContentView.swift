@@ -12,19 +12,20 @@ struct ContentView: View {
 		ZStack{
 				//Dropdownlist
 			VStack{
-				VStack{}.frame(height: 150)
+				//empty vstack to push the dropdown down
+				VStack{}.frame(height: 170)
 				if isDropdownVisible {
 					DropdownList(
 						isDropdownVisible: $isDropdownVisible,
 						selectedCategory: $selectedCategory,
 						timeTracker: timeTracker,
 						hoveredCategory: $hoveredCategory,
-						timeInterval: $timeInterval
+						timeInterval: $timeInterval	
 					)
 					.padding()
 					.background(Color.mint.gradient.opacity(0.8))
 					.cornerRadius(8)
-					.frame(maxWidth: CGFloat(DropdownList.dropDownWidth+55), minHeight: 90)
+					.frame(maxWidth: CGFloat(DropdownList.dropDownWidth+255), minHeight: 90)
 					.transition(AnyTransition.opacity
 						.combined(with: .move(edge: .top))
 						.combined(with: .verticalScale)) // Custom transition
@@ -129,19 +130,33 @@ struct ContentView: View {
 	}
 }
 
+import SwiftUI
+
 extension AnyTransition {
 	static var verticalScale: AnyTransition {
 		AnyTransition.modifier(
-			active: ScaleEffectModifier(scale: 0.2),
-			identity: ScaleEffectModifier(scale: 1.0)
+			active: ScaleEffectModifier(scale: 0.2, isHorizontal: false),
+			identity: ScaleEffectModifier(scale: 1.0, isHorizontal: false)
+		)
+	}
+	
+	static var horizontalScale: AnyTransition {
+		AnyTransition.modifier(
+			active: ScaleEffectModifier(scale: 0.2, isHorizontal: true),
+			identity: ScaleEffectModifier(scale: 1.0, isHorizontal: true)
 		)
 	}
 	
 	struct ScaleEffectModifier: ViewModifier {
 		var scale: CGFloat
+		var isHorizontal: Bool
 		
 		func body(content: Content) -> some View {
-			content.scaleEffect(CGSize(width: 1.0, height: scale), anchor: .top)
+			if isHorizontal {
+				content.scaleEffect(CGSize(width: scale, height: 1.0), anchor: .leading)
+			} else {
+				content.scaleEffect(CGSize(width: 1.0, height: scale), anchor: .top)
+			}
 		}
 	}
 }

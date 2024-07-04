@@ -8,7 +8,12 @@ class TimeTracker: ObservableObject {
 	
 	func getTimeString(for interval: TimeInterval) -> String {
 		let minutes = Int(interval) / 60
+		let hours = minutes % 60
 		let seconds = Int(interval) % 60
-		return String(format: "%02d:%02d", minutes, seconds)
+		if(minutes < 60){
+			return String(format: "%02d:%02d", minutes, seconds)
+		} else {
+			return String(format: "%02d:%02d", hours, minutes)
+		}
 	}
 }

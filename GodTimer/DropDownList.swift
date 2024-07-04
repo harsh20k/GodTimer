@@ -7,9 +7,13 @@ struct DropdownList: View {
 	@ObservedObject var timeTracker: TimeTracker
 	@Binding var hoveredCategory: String?
 	@Binding var timeInterval: TimeInterval
+	
+	static private var hightlightColor = Color.teal
 	static private var transitionDuration = 0.3
 	static public var dropDownWidth = 80
+	
 	@State private var isRightArrowHovered = false
+	@State private var isDropDownDetailsVisisble = false
 	
 	var body: some View {
 		HStack {
@@ -47,15 +51,27 @@ struct DropdownList: View {
 						)
 				}
 				Image(systemName: "arrowshape.right.fill")
-					.foregroundStyle(isRightArrowHovered ? Color.orange : Color.white)
+					.foregroundStyle(isRightArrowHovered ? DropdownList.hightlightColor : Color.white)
 					.frame(width: 5)
 			}
 			.onHover(perform: { hovering in
 				isRightArrowHovered = hovering
 			})
 			.frame(width:20, height:65)
-
-
+			.onTapGesture {
+				withAnimation{
+					isDropDownDetailsVisisble.toggle()
+				}
+			}
+			
+			if(isDropDownDetailsVisisble){
+				VStack{
+					Text("sdlksldfjsldkj")
+				}
+				.transition(AnyTransition.opacity
+					.combined(with: .move(edge: .trailing)))
+//					.combined(with: .verticalScale)) // Custom transition
+			}
 		}
 	}
 	
@@ -72,7 +88,7 @@ struct DropdownList: View {
 				Text(time)
 					.font(.title2.weight(.medium).monospacedDigit())
 					.shadow(radius: 5)
-					.foregroundColor(hoveredCategory == category ? Color.orange : Color.white)
+					.foregroundColor(hoveredCategory == category ? DropdownList.hightlightColor : Color.white)
 					.onTapGesture {
 						withAnimation(.smooth(duration: DropdownList.transitionDuration)) {
 							selectedCategory = category
