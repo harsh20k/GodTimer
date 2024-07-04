@@ -7,6 +7,7 @@ struct DropdownList: View {
 	@ObservedObject var timeTracker: TimeTracker
 	@Binding var hoveredCategory: String?
 	@Binding var timeInterval: TimeInterval
+	static private var transitionDuration = 0.3
 	
 	var body: some View {
 		VStack {
@@ -26,13 +27,17 @@ struct DropdownList: View {
 		GeometryReader { proxy in
 			HStack {
 				Text("\(category):")
+					.font(
+						withAnimation{
+							selectedCategory == category ? .body.weight(.bold) : .body
+						})
 				Spacer()
 				Text(time)
 					.font(.title2.weight(.medium).monospacedDigit())
 					.shadow(radius: 5)
 					.foregroundColor(hoveredCategory == category ? Color.orange : Color.white)
 					.onTapGesture {
-						withAnimation(.snappy()) {
+						withAnimation(.smooth(duration: DropdownList.transitionDuration)) {
 							selectedCategory = category
 							switch category {
 							case "G":
@@ -47,17 +52,20 @@ struct DropdownList: View {
 						}
 					}
 					.onHover { hovering in
-						hoveredCategory = hovering ? category : nil
+						withAnimation{
+							hoveredCategory = hovering ? category : nil
+						}
 					}
 			}
 			.background(
 				ZStack {
 					if selectedCategory == category {
-						RoundedRectangle(cornerRadius: 10)
-							.fill(Color.black.opacity(0.5))
+						Capsule()
+							.fill(Color.black.opacity(0.9))
 							.matchedGeometryEffect(id: "rectangle", in: animationSpace)
 					}
 				}
+					.frame(width:95, height:30)
 			)
 		}
 		.frame(height: 15)
