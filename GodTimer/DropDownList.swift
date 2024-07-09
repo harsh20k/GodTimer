@@ -7,6 +7,8 @@ struct ChartData: Identifiable {
 	let value: Double
 }
 
+import SwiftUI
+
 struct DropdownList: View {
 	@Namespace private var animationSpace
 	@Binding var isDropdownVisible: Bool
@@ -21,6 +23,7 @@ struct DropdownList: View {
 	
 	@State private var isRightArrowHovered = false
 	@State private var isDropDownDetailsVisisble = false
+	@State private var hoveredData: ChartData?
 	
 	private var chartData: [ChartData] {
 		[
@@ -32,12 +35,12 @@ struct DropdownList: View {
 	
 	var body: some View {
 		VStack {
-			HStack(spacing:0) {
+			HStack {
 					// Three rows for timers
 				VStack {
-					categoryRow(category: "G", time: timeTracker.getTimeString(for: timeTracker.meditationTime))
-					categoryRow(category: "O", time: timeTracker.getTimeString(for: timeTracker.officeTime))
-					categoryRow(category: "D", time: timeTracker.getTimeString(for: timeTracker.idleTime))
+					categoryRow(category: "G", time: timeTracker.getFixedSizeTimeString(for: timeTracker.meditationTime))
+					categoryRow(category: "O", time: timeTracker.getFixedSizeTimeString(for: timeTracker.officeTime))
+					categoryRow(category: "D", time: timeTracker.getFixedSizeTimeString(for: timeTracker.idleTime))
 					barChartView
 				}
 				.onTapGesture {
@@ -147,29 +150,33 @@ struct DropdownList: View {
 			let totalTime = chartData.map { $0.value }.reduce(0, +)
 			HStack(spacing: 2) {
 				ForEach(chartData) { data in
-					Rectangle()
+					Capsule()
 						.fill(color(for: data.category))
 						.frame(width: CGFloat(data.value) / CGFloat(totalTime) * geometry.size.width)
-						.animation(.easeInOut(duration: 0.5), value: data.value) // Smooth transition
 						.onHover { hovering in
-							if hovering {
-									// Add interactivity for hover
+							withAnimation {
+								hoveredData = hovering ? data : nil
 							}
 						}
-						.onTapGesture {
-								// Add interactivity for tap
-						}
+						.transition(AnyTransition.scale.combined(with: .push(from: .top)))
+						.overlay(
+							GeometryReader { overlayGeometry in
+								if let hoveredData = hoveredData, hoveredData.id == data.id {
+									TooltipView(text: "\(Int(data.value / totalTime * 100))%")
+										.position(x: overlayGeometry.size.width / 2, y: -20)
+								}
+							}
+						)
 				}
 			}
 		}
-		.frame(height: 5) // Thinner bar chart
+		.frame(height: 10) // Thinner bar chart
 	}
-
 	
 	private func color(for category: String) -> Color {
 		switch category {
 		case "G":
-			return .orange
+			return .green
 		case "O":
 			return .blue
 		case "D":
@@ -177,6 +184,19 @@ struct DropdownList: View {
 		default:
 			return .gray
 		}
+	}
+}
+
+struct TooltipView: View {
+	var text: String
+	
+	var body: some View {
+		Text(text)
+			.font(.caption)
+			.padding(5)
+			.background(Color.black.opacity(0.7))
+			.foregroundColor(.white)
+			.cornerRadius(5)
 	}
 }
 
