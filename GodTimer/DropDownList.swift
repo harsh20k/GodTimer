@@ -4,10 +4,9 @@ import Charts
 struct ChartData: Identifiable {
 	let id = UUID()
 	let category: String
-	let value: Double
+	var value: Double
 }
 
-import SwiftUI
 
 struct DropdownList: View {
 	@Namespace private var animationSpace
@@ -17,12 +16,12 @@ struct DropdownList: View {
 	@Binding var hoveredCategory: String?
 	@Binding var timeInterval: TimeInterval
 	
-	static private var hightlightColor = Color.teal
+	static private var highlightColor = Color.teal
 	static private var transitionDuration = 0.3
 	static public var dropDownWidth = 80
 	
 	@State private var isRightArrowHovered = false
-	@State private var isDropDownDetailsVisisble = false
+	@State private var isDropDownDetailsVisible = false
 	@State private var hoveredData: ChartData?
 	
 	private var chartData: [ChartData] {
@@ -71,25 +70,23 @@ struct DropdownList: View {
 							)
 					}
 					Image(systemName: "arrowshape.right.fill")
-						.foregroundStyle(isRightArrowHovered ? DropdownList.hightlightColor : Color.white)
+						.foregroundStyle(isRightArrowHovered ? DropdownList.highlightColor : Color.white)
 						.frame(width: 5)
 				}
-				.onHover(perform: { hovering in
+				.onHover { hovering in
 					isRightArrowHovered = hovering
-				})
+				}
 				.frame(width: 20, height: 65)
 				.onTapGesture {
 					withAnimation {
-						isDropDownDetailsVisisble.toggle()
+						isDropDownDetailsVisible.toggle()
 					}
 				}
 				
-				if isDropDownDetailsVisisble {
+				if isDropDownDetailsVisible {
 					VStack {
 						barChartView
 					}
-					.transition(AnyTransition.opacity
-						.combined(with: .move(edge: .trailing)))
 				}
 			}
 		}
@@ -105,7 +102,7 @@ struct DropdownList: View {
 				Text(time)
 					.font(.title2.weight(.medium).monospacedDigit())
 					.shadow(radius: 5)
-					.foregroundColor(hoveredCategory == category ? DropdownList.hightlightColor : Color.white)
+					.foregroundColor(hoveredCategory == category ? DropdownList.highlightColor : Color.white)
 					.onTapGesture {
 						withAnimation(.easeInOut(duration: DropdownList.transitionDuration)) {
 							selectedCategory = category
@@ -146,31 +143,32 @@ struct DropdownList: View {
 	}
 	
 	private var barChartView: some View {
-		GeometryReader { geometry in
-			let totalTime = chartData.map { $0.value }.reduce(0, +)
-			HStack(spacing: 2) {
-				ForEach(chartData) { data in
-					Capsule()
-						.fill(color(for: data.category))
-						.frame(width: CGFloat(data.value) / CGFloat(totalTime) * geometry.size.width)
-						.onHover { hovering in
-							withAnimation {
-								hoveredData = hovering ? data : nil
-							}
-						}
-						.transition(AnyTransition.scale.combined(with: .push(from: .top)))
-						.overlay(
-							GeometryReader { overlayGeometry in
-								if let hoveredData = hoveredData, hoveredData.id == data.id {
-									TooltipView(text: "\(Int(data.value / totalTime * 100))%")
-										.position(x: overlayGeometry.size.width / 2, y: -20)
+		VStack(spacing: 0) {
+			ZStack(alignment: .leading) {
+				GeometryReader { geometry in
+					let totalTime = chartData.map { $0.value }.reduce(0, +)
+					HStack(spacing: 0) {
+						ForEach(chartData) { data in
+							Rectangle()
+								.fill(color(for: data.category))
+								.frame(width: CGFloat(data.value) / CGFloat(totalTime) * geometry.size.width)
+								.onHover { hovering in
+									hoveredData = hovering ? data : nil
 								}
-							}
-						)
+								.overlay(
+									GeometryReader { overlayGeometry in
+										if let hoveredData = hoveredData, hoveredData.id == data.id {
+											TooltipView(text: "\(Int(data.value / totalTime * 100))%")
+												.position(x: overlayGeometry.size.width / 2, y: -20)
+										}
+									}
+								)
+						}
+					}
 				}
 			}
-		}
-		.frame(height: 10) // Thinner bar chart
+			.frame(height: 5)
+		} // Thinner bar chart
 	}
 	
 	private func color(for category: String) -> Color {
