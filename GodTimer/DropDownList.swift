@@ -44,8 +44,8 @@ struct DropdownList: View {
 					categoryRow(category: "G", time: timeTracker.getFixedSizeTimeString(for: timeTracker.meditationTime))
 					categoryRow(category: "O", time: timeTracker.getFixedSizeTimeString(for: timeTracker.officeTime))
 					categoryRow(category: "D", time: timeTracker.getFixedSizeTimeString(for: timeTracker.idleTime))
+						.padding(.bottom, 8)
 					barChartView
-						.padding(.top)
 				}
 				.onTapGesture {
 					withAnimation {
@@ -100,15 +100,23 @@ struct DropdownList: View {
 		}
 	}
 	
+	private func invalidateTimers() {
+		stateTimer?.invalidate()
+		stateTimer = nil
+	}
 	private func startTimerForBarChart() {
+		invalidateTimers()
 			// Timer for state variables
 		stateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-			withAnimation() {
+			withAnimation(.easeInOut(duration:1)) {
 				chartData[0].value = timeTracker.meditationTime
 				chartData[1].value = timeTracker.officeTime
 				chartData[2].value = timeTracker.idleTime
 			}
 		}
+	}
+	private func totalChartValue() -> Double {
+		chartData.map { $0.value }.reduce(0, +)
 	}
 	
 	@ViewBuilder
@@ -164,6 +172,8 @@ struct DropdownList: View {
 	private var barChartView: some View {
 		GeometryReader { geometry in
 			ZStack(alignment: .leading) {
+				Capsule()
+					.stroke()
 				HStack(spacing: 0) {
 					ForEach(chartData) { data in
 						barView(for: data, totalTime: totalChartValue(), geometryWidth: geometry.size.width)
@@ -176,7 +186,7 @@ struct DropdownList: View {
 	
 	private func barView(for data: ChartData, totalTime: Double, geometryWidth: CGFloat) -> some View {
 		let width = CGFloat(data.value) / CGFloat(totalTime) * geometryWidth
-		return Rectangle()
+		return Capsule()
 			.fill(color(for: data.category))
 			.frame(width: width.isFinite && width > 0 ? width : 0)
 			.onHover { hovering in
@@ -205,9 +215,6 @@ struct DropdownList: View {
 		}
 	}
 	
-	private func totalChartValue() -> Double {
-		chartData.map { $0.value }.reduce(0, +)
-	}
 	
 }
 
