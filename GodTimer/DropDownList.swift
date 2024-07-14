@@ -7,7 +7,6 @@ struct ChartData: Identifiable {
 	var value: Double
 }
 
-
 struct DropdownList: View {
 	@Namespace private var animationSpace
 	@Binding var isDropdownVisible: Bool
@@ -24,23 +23,29 @@ struct DropdownList: View {
 	@State private var isDropDownDetailsVisible = false
 	@State private var hoveredData: ChartData?
 	
-	private var chartData: [ChartData] {
-		[
-			ChartData(category: "G", value: timeTracker.meditationTime),
-			ChartData(category: "O", value: timeTracker.officeTime),
-			ChartData(category: "D", value: timeTracker.idleTime)
-		]
+	struct ChartData: Identifiable {
+		let id = UUID()
+		let category: String
+		var value: Double
 	}
+	@State private var chartData: [ChartData] = [
+		ChartData(category: "G", value: 0),
+		ChartData(category: "O", value: 0),
+		ChartData(category: "D", value: 0)
+	]
+	@State private var stateTimer: Timer?
+
 	
 	var body: some View {
 		VStack {
 			HStack {
-					// Three rows for timers
+					// Three rows for timer
 				VStack {
 					categoryRow(category: "G", time: timeTracker.getFixedSizeTimeString(for: timeTracker.meditationTime))
 					categoryRow(category: "O", time: timeTracker.getFixedSizeTimeString(for: timeTracker.officeTime))
 					categoryRow(category: "D", time: timeTracker.getFixedSizeTimeString(for: timeTracker.idleTime))
 					barChartView
+						.padding(.top)
 				}
 				.onTapGesture {
 					withAnimation {
@@ -88,6 +93,20 @@ struct DropdownList: View {
 						barChartView
 					}
 				}
+			}
+		}
+		.onAppear {
+			startTimerForBarChart()
+		}
+	}
+	
+	private func startTimerForBarChart() {
+			// Timer for state variables
+		stateTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+			withAnimation() {
+				chartData[0].value = timeTracker.meditationTime
+				chartData[1].value = timeTracker.officeTime
+				chartData[2].value = timeTracker.idleTime
 			}
 		}
 	}
@@ -143,38 +162,40 @@ struct DropdownList: View {
 	}
 	
 	private var barChartView: some View {
-		VStack(spacing: 0) {
+		GeometryReader { geometry in
 			ZStack(alignment: .leading) {
-				GeometryReader { geometry in
-					let totalTime = chartData.map { $0.value }.reduce(0, +)
-					HStack(spacing: 0) {
-						ForEach(chartData) { data in
-							Rectangle()
-								.fill(color(for: data.category))
-								.frame(width: CGFloat(data.value) / CGFloat(totalTime) * geometry.size.width)
-								.onHover { hovering in
-									hoveredData = hovering ? data : nil
-								}
-								.overlay(
-									GeometryReader { overlayGeometry in
-										if let hoveredData = hoveredData, hoveredData.id == data.id {
-											TooltipView(text: "\(Int(data.value / totalTime * 100))%")
-												.position(x: overlayGeometry.size.width / 2, y: -20)
-										}
-									}
-								)
-						}
+				HStack(spacing: 0) {
+					ForEach(chartData) { data in
+						barView(for: data, totalTime: totalChartValue(), geometryWidth: geometry.size.width)
 					}
 				}
 			}
-			.frame(height: 5)
-		} // Thinner bar chart
+		}
+		.frame(height: 5) // Thinner bar chart
+	}
+	
+	private func barView(for data: ChartData, totalTime: Double, geometryWidth: CGFloat) -> some View {
+		let width = CGFloat(data.value) / CGFloat(totalTime) * geometryWidth
+		return Rectangle()
+			.fill(color(for: data.category))
+			.frame(width: width.isFinite && width > 0 ? width : 0)
+			.onHover { hovering in
+				hoveredData = hovering ? data : nil
+			}
+			.overlay(
+				GeometryReader { overlayGeometry in
+					if let hoveredData = hoveredData, hoveredData.id == data.id {
+						TooltipView(text: "\(Int(data.value / totalTime * 100))%")
+							.position(x: overlayGeometry.size.width / 2, y: -20)
+					}
+				}
+			)
 	}
 	
 	private func color(for category: String) -> Color {
 		switch category {
 		case "G":
-			return .green
+			return .orange
 		case "O":
 			return .blue
 		case "D":
@@ -183,6 +204,11 @@ struct DropdownList: View {
 			return .gray
 		}
 	}
+	
+	private func totalChartValue() -> Double {
+		chartData.map { $0.value }.reduce(0, +)
+	}
+	
 }
 
 struct TooltipView: View {

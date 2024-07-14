@@ -107,7 +107,7 @@ struct ContentView: View {
 		stopTimer() // Stop any existing timer before starting a new one
 		timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
 			timeInterval += 1
-			withAnimation{
+			withAnimation(.easeInOut){
 				updateCategoryTime()
 			}
 		}
