@@ -6,6 +6,14 @@ class TimeTracker: ObservableObject {
 	@Published var officeTime: TimeInterval = 0
 	@Published var idleTime: TimeInterval = 0
 	
+	func getCategoriesAbbreviated() -> [String] {
+		return ["G", "O", "D"]
+	}
+	
+	func getIntervals() -> [TimeInterval] {
+		return [meditationTime,officeTime,idleTime]
+	}
+	
 	func getTimeString(for interval: TimeInterval) -> String {
 		let minutes = Int(interval) / 60
 		let hours = Int(minutes) / 60
