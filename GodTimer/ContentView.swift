@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-	@StateObject var timeTracker = TimeTracker()
+	@State var timeTracker = TimeTracker()
 	@State private var selectedCategory: String = "G"
 	@State private var timeInterval: TimeInterval = 0
 	@State private var isDropdownVisible: Bool = false
@@ -9,73 +9,78 @@ struct ContentView: View {
 	@State private var hoveredCategory: String?
 	
 	var body: some View {
-		ZStack{
-				//Dropdownlist
-			VStack{
-				//empty vstack to push the dropdown down
-				VStack{}.frame(height: 170)
-				if isDropdownVisible {
-					DropdownList(
-						isDropdownVisible: $isDropdownVisible,
-						selectedCategory: $selectedCategory,
-						timeTracker: timeTracker,
-						hoveredCategory: $hoveredCategory,
-						timeInterval: $timeInterval	
-					)
-					.padding()
-					.background(Color.mint.gradient.opacity(0.8))
-					.cornerRadius(8)
-					.frame(maxWidth: CGFloat(DropdownList.dropDownWidth+255), minHeight: 90)
-					.transition(AnyTransition.opacity
-						.combined(with: .move(edge: .top))
-						.combined(with: .verticalScale)) // Custom transition
-				}
+		ZStack {
+				// DropdownList
+			PushCardView(isVisible: isDropdownVisible, alignment: .vertical, placement: .bottom) {
+				DropdownList(
+					isDropdownVisible: $isDropdownVisible,
+					selectedCategory: $selectedCategory,
+					timeTracker: timeTracker,
+					hoveredCategory: $hoveredCategory,
+					timeInterval: $timeInterval
+				)
 			}
+			
+//			PushCardView(isVisible: isDropdownVisible, alignment: .horizontal, placement: .right) {
+//				DropdownList(
+//					isDropdownVisible: $isDropdownVisible,
+//					selectedCategory: $selectedCategory,
+//					timeTracker: timeTracker,
+//					hoveredCategory: $hoveredCategory,
+//					timeInterval: $timeInterval
+//				)
+//			}
+			
+//			PushCardView(isVisible: isDropdownVisible, alignment: .vertical, placement: .top) {
+//				List(0..<3){ i in
+//					Text ("item number \(i)")
+//				}
+//			}
+//			PushCardView(isVisible: isDropdownVisible, alignment: .vertical, placement: .bottom) {
+//			}
+			
 			ZStack {
 				Grid {
-					GridRow{
-						HStack{//empty view just to push the timer to the right
-						}.frame(width: 30)
+					GridRow {
 						HStack {
-							Spacer()
 							Text("\(timeTracker.getTimeString(for: timeInterval))")
-						}
-						.font(.title.weight(.heavy).monospacedDigit())
-						.padding()
-						.frame(minWidth: 200)
-						.background(Color.black.opacity(0.8))
-						.cornerRadius(12)
-						.onTapGesture {
-							withAnimation(.easeInOut(duration: 0.2)) {
-								isDropdownVisible.toggle()
-							}
-						}
-						.background(DraggableWindow())
-						.onAppear(perform: startTimer)
-						.contextMenu {
-							Button(action: {
-								withAnimation {
-									selectedCategory = "G"
-									timeInterval = timeTracker.meditationTime
+								.font(.title.weight(.heavy).monospacedDigit())
+								.padding()
+								.frame(minWidth: 200)
+								.background(Color.black.opacity(0.8))
+								.cornerRadius(12)
+								.onTapGesture {
+									withAnimation(.easeInOut(duration: 0.2)) {
+										isDropdownVisible.toggle()
+									}
 								}
-							}) { Text("Meditation") }
-							Button(action: {
-								withAnimation {
-									selectedCategory = "O"
-									timeInterval = timeTracker.officeTime
+								.background(DraggableWindow())
+								.onAppear(perform: startTimer)
+								.contextMenu {
+									Button(action: {
+										withAnimation {
+											selectedCategory = "G"
+											timeInterval = timeTracker.meditationTime
+										}
+									}) { Text("Meditation") }
+									Button(action: {
+										withAnimation {
+											selectedCategory = "O"
+											timeInterval = timeTracker.officeTime
+										}
+									}) { Text("Office") }
+									Button(action: {
+										withAnimation {
+											selectedCategory = "D"
+											timeInterval = timeTracker.idleTime
+										}
+									}) { Text("Idle") }
 								}
-							}) { Text("Office") }
-							Button(action: {
-								withAnimation {
-									selectedCategory = "D"
-									timeInterval = timeTracker.idleTime
-								}
-							}) { Text("Idle") }
 						}
 					}
 				}
 				
-					//Circle with category name
+					// Circle with category name
 				HStack {
 					if selectedCategory == "G" {
 						Text("\(selectedCategory)")
@@ -96,10 +101,17 @@ struct ContentView: View {
 							.background(Color.red.gradient)
 							.clipShape(Circle())
 					}
-					Spacer()
+					HStack{}.frame(width: 200)
 				}
 			}
-
+			.background(
+				GeometryReader { geometry in
+					Color.clear
+						.onAppear {
+							print("zstack size: \(geometry.size)")
+						}
+				}
+			)
 		}
 	}
 	
@@ -128,37 +140,6 @@ struct ContentView: View {
 			timeTracker.idleTime = timeInterval
 		default:
 			break
-		}
-	}
-}
-
-import SwiftUI
-
-extension AnyTransition {
-	static var verticalScale: AnyTransition {
-		AnyTransition.modifier(
-			active: ScaleEffectModifier(scale: 0.2, isHorizontal: false),
-			identity: ScaleEffectModifier(scale: 1.0, isHorizontal: false)
-		)
-	}
-	
-	static var horizontalScale: AnyTransition {
-		AnyTransition.modifier(
-			active: ScaleEffectModifier(scale: 0.2, isHorizontal: true),
-			identity: ScaleEffectModifier(scale: 1.0, isHorizontal: true)
-		)
-	}
-	
-	struct ScaleEffectModifier: ViewModifier {
-		var scale: CGFloat
-		var isHorizontal: Bool
-		
-		func body(content: Content) -> some View {
-			if isHorizontal {
-				content.scaleEffect(CGSize(width: scale, height: 1.0), anchor: .leading)
-			} else {
-				content.scaleEffect(CGSize(width: 1.0, height: scale), anchor: .top)
-			}
 		}
 	}
 }

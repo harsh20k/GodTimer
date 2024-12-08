@@ -8,16 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		3A31128C2C37294B00AC1F8E /* DropDowListDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A31128B2C37294B00AC1F8E /* DropDowListDetails.swift */; };
+		3A4DE4AB2C498CE10024BAED /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A4DE4AA2C498CE10024BAED /* Extensions.swift */; };
 		3A97FF4E2C3276B30058BD65 /* DropDownList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A97FF4D2C3276B30058BD65 /* DropDownList.swift */; };
 		3AD3E36B2C3002CC0060B765 /* GodTimerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3E36A2C3002CC0060B765 /* GodTimerApp.swift */; };
 		3AD3E36D2C3002CC0060B765 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3E36C2C3002CC0060B765 /* ContentView.swift */; };
 		3AD3E36F2C3002CD0060B765 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AD3E36E2C3002CD0060B765 /* Assets.xcassets */; };
 		3AD3E3722C3002CD0060B765 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3AD3E3712C3002CD0060B765 /* Preview Assets.xcassets */; };
 		3AD3E37A2C30042D0060B765 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AD3E3792C30042D0060B765 /* DataModel.swift */; };
+		3ADB8EDA2C4A2EF10022E666 /* PushCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ADB8ED92C4A2EF10022E666 /* PushCardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		3A31128B2C37294B00AC1F8E /* DropDowListDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropDowListDetails.swift; sourceTree = "<group>"; };
+		3A4DE4AA2C498CE10024BAED /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		3A97FF4D2C3276B30058BD65 /* DropDownList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropDownList.swift; sourceTree = "<group>"; };
 		3AD3E3672C3002CC0060B765 /* GodTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GodTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AD3E36A2C3002CC0060B765 /* GodTimerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GodTimerApp.swift; sourceTree = "<group>"; };
@@ -26,6 +29,7 @@
 		3AD3E3712C3002CD0060B765 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3AD3E3732C3002CD0060B765 /* GodTimer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GodTimer.entitlements; sourceTree = "<group>"; };
 		3AD3E3792C30042D0060B765 /* DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
+		3ADB8ED92C4A2EF10022E666 /* PushCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushCardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +64,8 @@
 			children = (
 				3AD3E36A2C3002CC0060B765 /* GodTimerApp.swift */,
 				3AD3E36C2C3002CC0060B765 /* ContentView.swift */,
+				3ADB8ED92C4A2EF10022E666 /* PushCardView.swift */,
+				3A4DE4AA2C498CE10024BAED /* Extensions.swift */,
 				3A31128B2C37294B00AC1F8E /* DropDowListDetails.swift */,
 				3A97FF4D2C3276B30058BD65 /* DropDownList.swift */,
 				3AD3E3792C30042D0060B765 /* DataModel.swift */,
@@ -149,6 +155,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				3A31128C2C37294B00AC1F8E /* DropDowListDetails.swift in Sources */,
+				3ADB8EDA2C4A2EF10022E666 /* PushCardView.swift in Sources */,
+				3A4DE4AB2C498CE10024BAED /* Extensions.swift in Sources */,
 				3AD3E36D2C3002CC0060B765 /* ContentView.swift in Sources */,
 				3AD3E36B2C3002CC0060B765 /* GodTimerApp.swift in Sources */,
 				3A97FF4E2C3276B30058BD65 /* DropDownList.swift in Sources */,
