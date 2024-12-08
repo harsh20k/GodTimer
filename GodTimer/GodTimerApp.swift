@@ -16,6 +16,7 @@ struct TimeTrackerApp: App {
 						window.standardWindowButton(.zoomButton)?.isHidden = true
 						window.styleMask.remove(.titled)
 						window.styleMask.insert(.fullSizeContentView)
+						window.hasShadow = false 
 						window.level = .statusBar // This line keeps the window always on top
 					}
 				})
