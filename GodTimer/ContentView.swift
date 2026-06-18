@@ -7,11 +7,12 @@ struct ContentView: View {
 	@State private var isDropdownVisible: Bool = false
 	@State private var timer: Timer?
 	@State private var hoveredCategory: String?
-	
+	@Namespace private var glassNamespace
+
 	var body: some View {
 		ZStack {
-				// DropdownList
-			PushCardView(isVisible: isDropdownVisible, alignment: .vertical, placement: .bottom) {
+			Color.clear
+			PushCardView(isVisible: isDropdownVisible, alignment: .vertical, placement: .bottom, glassNamespace: glassNamespace) {
 				DropdownList(
 					isDropdownVisible: $isDropdownVisible,
 					selectedCategory: $selectedCategory,
@@ -20,130 +21,92 @@ struct ContentView: View {
 					timeInterval: $timeInterval
 				)
 			}
-			
-//			PushCardView(isVisible: isDropdownVisible, alignment: .horizontal, placement: .right) {
-//				DropdownList(
-//					isDropdownVisible: $isDropdownVisible,
-//					selectedCategory: $selectedCategory,
-//					timeTracker: timeTracker,
-//					hoveredCategory: $hoveredCategory,
-//					timeInterval: $timeInterval
-//				)
-//			}
-			
-//			PushCardView(isVisible: isDropdownVisible, alignment: .vertical, placement: .top) {
-//				List(0..<3){ i in
-//					Text ("item number \(i)")
-//				}
-//			}
-//			PushCardView(isVisible: isDropdownVisible, alignment: .vertical, placement: .bottom) {
-//			}
-			
-			ZStack {
-				Grid {
-					GridRow {
-						HStack {
-							Text("\(timeTracker.getTimeString(for: timeInterval))")
-								.font(.title.weight(.heavy).monospacedDigit())
-								.padding()
-								.frame(minWidth: 200)
-								.background(Color.black.opacity(0.8))
-								.cornerRadius(12)
-								.onTapGesture {
-									withAnimation(.easeInOut(duration: 0.2)) {
-										isDropdownVisible.toggle()
-									}
-								}
-								.background(DraggableWindow())
-								.onAppear(perform: startTimer)
-								.contextMenu {
-									Button(action: {
-										withAnimation {
-											selectedCategory = "G"
-											timeInterval = timeTracker.meditationTime
-										}
-									}) { Text("Meditation") }
-									Button(action: {
-										withAnimation {
-											selectedCategory = "O"
-											timeInterval = timeTracker.officeTime
-										}
-									}) { Text("Office") }
-									Button(action: {
-										withAnimation {
-											selectedCategory = "D"
-											timeInterval = timeTracker.idleTime
-										}
-									}) { Text("Idle") }
-								}
+
+			GlassEffectContainer(spacing: 16) {
+				ZStack {
+					// Timer pill
+					Text(timeTracker.getTimeString(for: timeInterval))
+						.font(.system(size: 28, weight: .heavy, design: .monospaced))
+						.foregroundStyle(.primary)
+						.padding(.horizontal, 20)
+						.padding(.vertical, 12)
+						.glassEffect(.regular.interactive(), in: Capsule())
+						.glassEffectID("timer", in: glassNamespace)
+						.onTapGesture {
+							withAnimation(.spring(duration: 0.4, bounce: 0.25)) {
+								isDropdownVisible.toggle()
+							}
 						}
+						.onAppear(perform: startTimer)
+						.background(DraggableWindow())
+						.contextMenu {
+							Button("Meditation") {
+								withAnimation(.spring(duration: 0.4, bounce: 0.25)) {
+									selectedCategory = "G"
+									timeInterval = timeTracker.meditationTime
+								}
+							}
+							Button("Office") {
+								withAnimation(.spring(duration: 0.4, bounce: 0.25)) {
+									selectedCategory = "O"
+									timeInterval = timeTracker.officeTime
+								}
+							}
+							Button("Idle") {
+								withAnimation(.spring(duration: 0.4, bounce: 0.25)) {
+									selectedCategory = "D"
+									timeInterval = timeTracker.idleTime
+								}
+							}
+						}
+
+					// Category badge
+					HStack {
+						Text(selectedCategory)
+							.font(.title.bold())
+							.foregroundStyle(.white)
+							.frame(width: 56, height: 56)
+							.glassEffect(.regular.tint(categoryColor(for: selectedCategory)), in: Circle())
+							.glassEffectID("badge", in: glassNamespace)
+						Spacer().frame(width: 200)
 					}
-				}
-				
-					// Circle with category name
-				HStack {
-					if selectedCategory == "G" {
-						Text("\(selectedCategory)")
-							.font(.title.bold())
-							.frame(width: 65, height: 65)
-							.background(Color.orange.gradient)
-							.clipShape(Circle())
-					} else if selectedCategory == "O" {
-						Text("\(selectedCategory)")
-							.font(.title.bold())
-							.frame(width: 65, height: 65)
-							.background(Color.blue.gradient)
-							.clipShape(Circle())
-					} else {
-						Text("\(selectedCategory)")
-							.font(.title.bold())
-							.frame(width: 65, height: 65)
-							.background(Color.red.gradient)
-							.clipShape(Circle())
-					}
-					HStack{}.frame(width: 200)
 				}
 			}
-			.background(
-				GeometryReader { geometry in
-					Color.clear
-						.onAppear {
-							print("zstack size: \(geometry.size)")
-						}
-				}
-			)
 		}
 	}
-	
+
+	private func categoryColor(for category: String) -> Color {
+		switch category {
+		case "G": return .orange
+		case "O": return Color(hue: 0.72, saturation: 0.8, brightness: 1.0)
+		default:  return Color(hue: 0.95, saturation: 0.85, brightness: 1.0)
+		}
+	}
+
 	func startTimer() {
-		stopTimer() // Stop any existing timer before starting a new one
+		stopTimer()
 		timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
 			timeInterval += 1
-			withAnimation(.easeInOut){
+			withAnimation(.easeInOut) {
 				updateCategoryTime()
 			}
 		}
 	}
-	
+
 	func stopTimer() {
 		timer?.invalidate()
 		timer = nil
 	}
-	
+
 	func updateCategoryTime() {
 		switch selectedCategory {
-		case "G":
-			timeTracker.meditationTime = timeInterval
-		case "O":
-			timeTracker.officeTime = timeInterval
-		case "D":
-			timeTracker.idleTime = timeInterval
-		default:
-			break
+		case "G": timeTracker.meditationTime = timeInterval
+		case "O": timeTracker.officeTime = timeInterval
+		case "D": timeTracker.idleTime = timeInterval
+		default: break
 		}
 	}
 }
-
 
 #Preview {
 	ContentView()

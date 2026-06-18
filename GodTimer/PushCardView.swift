@@ -4,19 +4,20 @@ struct PushCardView<Content: View>: View {
 	enum Alignment {
 		case horizontal, vertical
 	}
-	
+
 	enum Placement {
 		case top, bottom, left, right
 	}
-	
+
 	var isVisible: Bool
 	var alignment: Alignment
 	var placement: Placement
 	var spacing: CGFloat?
+	var glassNamespace: Namespace.ID
 	@ViewBuilder var content: () -> Content
-	
+
 	@State private var contentSize: CGSize = .zero
-	
+
 	var body: some View {
 		Group {
 			switch alignment {
@@ -27,9 +28,9 @@ struct PushCardView<Content: View>: View {
 			}
 		}
 	}
-	
+
 	private var verticalLayout: some View {
-		VStack {
+		VStack(spacing: 0) {
 			if placement == .top {
 				contentWithTransition(from: .bottom)
 				spacerView(height: spacing ?? 190)
@@ -39,9 +40,9 @@ struct PushCardView<Content: View>: View {
 			}
 		}
 	}
-	
+
 	private var horizontalLayout: some View {
-		HStack {
+		HStack(spacing: 0) {
 			if placement == .left {
 				contentWithTransition(from: .trailing)
 				spacerView(width: spacing ?? 430)
@@ -51,7 +52,7 @@ struct PushCardView<Content: View>: View {
 			}
 		}
 	}
-	
+
 	@ViewBuilder
 	private func spacerView(height: CGFloat? = nil, width: CGFloat? = nil) -> some View {
 		if let height = height {
@@ -60,38 +61,33 @@ struct PushCardView<Content: View>: View {
 			HStack {}.frame(width: width)
 		}
 	}
-	
+
 	private func contentWithTransition(from edge: Edge) -> some View {
 		contentView
-			.transition(AnyTransition.opacity
-				.combined(with: .move(edge: edge))
-				.combined(with: edge == .top || edge == .bottom ? .verticalScale : .horizontalScale))
+			.transition(
+				AnyTransition.opacity
+					.combined(with: .move(edge: edge))
+					.combined(with: edge == .top || edge == .bottom ? .verticalScale : .horizontalScale)
+			)
 	}
-	
+
 	private var contentView: some View {
 		Group {
 			if isVisible {
 				content()
 					.padding()
-					.background(Color.mint.gradient.opacity(1))
-					.cornerRadius(8)
-					.frame(maxWidth: CGFloat(DropdownList.dropDownWidth + 255), minHeight: 90)
-					.background(
-						GeometryReader { geometry in
-							Color.clear
-								.onAppear {
-									contentSize = geometry.size
-									print("View size: \(contentSize)")
-								}
-						}
-					)
+					.glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+					.glassEffectID("panel", in: glassNamespace)
+					.frame(maxWidth: CGFloat(DropdownList.dropDownWidth + 260), minHeight: 110)
 			}
 		}
+		.background(Color.clear)
 	}
 }
 
 #Preview {
-	PushCardView(isVisible: true, alignment: .vertical, placement: .top) {
+	@Previewable @Namespace var ns
+	PushCardView(isVisible: true, alignment: .vertical, placement: .top, glassNamespace: ns) {
 		Text("Placeholder for DropdownList")
 	}
 }
